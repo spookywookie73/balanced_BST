@@ -20,12 +20,59 @@ class Tree
     
     return nil if array_start > array_end
     array_middle = (array_start + array_end) / 2
-    root_node = Node.new(array[array_middle])
+    root = Node.new(array[array_middle])
 
-    root_node.left = build_tree(array, array_start, array_middle - 1)
-    root_node.right = build_tree(array, array_middle + 1, array_end)
+    root.left = build_tree(array, array_start, array_middle - 1)
+    root.right = build_tree(array, array_middle + 1, array_end)
     
-    return root_node
+    return root
+  end
+
+
+  
+  def insert(value, node = @root)
+    if @root == nil
+      return @root = Node.new(value)
+    end
+    if node == nil
+      return Node.new(value)
+    end
+
+    if value < node.data
+      node.left = insert(value, node.left)
+    else
+      node.right = insert(value, node.right)
+    end
+    return node
+  end
+
+  def delete(value, node = @root)
+    return @root if @root == nil
+    
+    if value < node.data
+      node.left = delete(value, node.left)
+    elsif value > node.data
+      node.right = delete(value, node.right)
+    else
+      if node.left == nil
+        return node.right
+      elsif node.right == nil
+        return node.left
+      end
+    
+      node.data = min_value(node.right)
+      node.right = delete(node.data, node.right)
+    end
+    return node
+  end
+
+  def min_value(node)
+    min_val = node.data
+    while node.left != nil
+      min_val = node.left.data
+      node = node.left
+    end
+    return min_val
   end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
