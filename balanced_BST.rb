@@ -78,16 +78,34 @@ class Tree
   def find(value, node = @root)
     return nil if @root == nil
     return node if node.data == value
-    
+
     return find(value, node.right) if node.data < value
     return find(value, node.left) if node.data > value
   end
 
+  def level_order(node = @root)
+    return if node == nil
+    queue = []
+    result = []
+    queue.push(node)
+    while(!queue.empty?)
+      node = queue.shift
+      if (node.left != nil)
+        queue.push(node.left)
+      end
+      if (node.right != nil)
+        queue.push(node.right)
+      end
+      result.push(node.data)
+    end
+    puts "Breadth-first traversal: #{result}"
+  end
+
   def pretty_print(node = @root, prefix = '', is_left = true)
+    return if node == nil
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
     pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.left
   end
-
 
 end
