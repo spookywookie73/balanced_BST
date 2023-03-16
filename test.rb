@@ -12,3 +12,10 @@ binary_tree.pretty_print
 #binary_tree.pretty_print
 #p binary_tree.find(4)
 binary_tree.level_order
+binary_tree.level_order { |node| print "#{node.data} " }; print "\n"
+puts binary_tree.inorder
+binary_tree.inorder{ |node| print "#{node.data} " }; print "\n"
+puts binary_tree.preorder
+binary_tree.preorder{ |node| print "#{node.data} " }; print "\n"
+puts binary_tree.postorder
+binary_tree.postorder{ |node| print "#{node.data} " }; print "\n"

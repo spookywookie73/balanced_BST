@@ -83,7 +83,7 @@ class Tree
     return find(value, node.left) if node.data > value
   end
 
-  def level_order(node = @root)
+  def level_order(node = @root, &block)
     return if node == nil
     queue = []
     result = []
@@ -96,9 +96,58 @@ class Tree
       if (node.right != nil)
         queue.push(node.right)
       end
-      result.push(node.data)
+      if block_given?
+        block.call(node)
+      else
+        result.push(node.data)
+      end
     end
-    puts "Breadth-first traversal: #{result}"
+    puts "Breadth-first traversal: #{result}" if !block_given?
+  end
+
+  def inorder(node = @root, result = [], &block)
+    return if node == nil
+    
+    if block_given?
+      inorder(node.left, &block) if node.left
+      block.call(node)
+      inorder(node.right, &block) if node.right
+    else
+      inorder(node.left, result) if node.left
+      result.push(node.data)
+      inorder(node.right, result) if node.right
+      return "In-order traversal: #{result}" if !block_given?
+    end
+  end
+
+  def preorder(node = @root, result = [], &block)
+    return if node == nil
+    
+    if block_given?
+      block.call(node)
+      preorder(node.left, &block) if node.left
+      preorder(node.right, &block) if node.right
+    else
+      result.push(node.data)
+      preorder(node.left, result) if node.left
+      preorder(node.right, result) if node.right
+      return "Pre-order traversal: #{result}" if !block_given?
+    end
+  end
+
+  def postorder(node = @root, result = [], &block)
+    return if node == nil
+    
+    if block_given?
+      postorder(node.left, &block) if node.left
+      postorder(node.right, &block) if node.right
+      block.call(node)
+    else
+      postorder(node.left, result) if node.left
+      postorder(node.right, result) if node.right
+      result.push(node.data)
+      return "Post-order traversal: #{result}" if !block_given?
+    end
   end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
