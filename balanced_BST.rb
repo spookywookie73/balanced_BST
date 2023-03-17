@@ -16,19 +16,17 @@ class Tree
   end
 
   def build_tree(array, array_start = 0, array_end = array.length - 1)
-    array = array.sort.uniq
-    
+    array = array.sort
+
     return nil if array_start > array_end
     array_middle = (array_start + array_end) / 2
     root = Node.new(array[array_middle])
 
     root.left = build_tree(array, array_start, array_middle - 1)
     root.right = build_tree(array, array_middle + 1, array_end)
-    
+
     return root
   end
-
-
   
   def insert(value, node = @root)
     if @root == nil
@@ -43,7 +41,6 @@ class Tree
     else
       node.right = insert(value, node.right)
     end
-    return node
   end
 
   def delete(value, node = @root)
@@ -63,7 +60,6 @@ class Tree
       node.data = min_value(node.right)
       node.right = delete(node.data, node.right)
     end
-    return node
   end
 
   def min_value(node)
@@ -76,11 +72,15 @@ class Tree
   end
 
   def find(value, node = @root)
-    return nil if @root == nil
-    return node if node.data == value
-
-    return find(value, node.right) if node.data < value
-    return find(value, node.left) if node.data > value
+    if node == nil
+      return "That node does not exist"
+    elsif node.data > value
+      return find(value, node.left)
+    elsif node.data < value
+      return find(value, node.right)
+    else
+      return node
+    end
   end
 
   def level_order(node = @root, &block)
@@ -90,19 +90,16 @@ class Tree
     queue.push(node)
     while(!queue.empty?)
       node = queue.shift
-      if (node.left != nil)
-        queue.push(node.left)
-      end
-      if (node.right != nil)
-        queue.push(node.right)
-      end
+      queue.push(node.left) if (node.left != nil)
+      queue.push(node.right) if (node.right != nil)
+        
       if block_given?
         block.call(node)
       else
         result.push(node.data)
       end
     end
-    puts "Breadth-first traversal: #{result}" if !block_given?
+    return result if !block_given?
   end
 
   def inorder(node = @root, result = [], &block)
@@ -116,7 +113,7 @@ class Tree
       inorder(node.left, result) if node.left
       result.push(node.data)
       inorder(node.right, result) if node.right
-      return "In-order traversal: #{result}" if !block_given?
+      return result if !block_given?
     end
   end
 
@@ -131,7 +128,7 @@ class Tree
       result.push(node.data)
       preorder(node.left, result) if node.left
       preorder(node.right, result) if node.right
-      return "Pre-order traversal: #{result}" if !block_given?
+      return result if !block_given?
     end
   end
 
@@ -146,8 +143,59 @@ class Tree
       postorder(node.left, result) if node.left
       postorder(node.right, result) if node.right
       result.push(node.data)
-      return "Post-order traversal: #{result}" if !block_given?
+      return result if !block_given?
     end
+  end
+
+  def height(node = @root)
+    return -1 if node.nil?
+    
+    node = find(node) if node.is_a?(Integer)
+    left_height = height(node.left)
+    right_height = height(node.right)
+
+    if left_height > right_height
+      return left_height + 1
+    elsif right_height > left_height
+      return right_height + 1
+    end
+  end
+
+  def depth(value, count = 0, node = @root)
+    if node == nil
+      return "That node does not exist"
+    elsif node.data > value
+      return depth(value, count + 1, node.left)
+    elsif node.data < value
+      return depth(value, count + 1, node.right)
+    else
+      puts count
+    end
+  end
+
+  
+
+  def balanced?(node = @root)
+    if node.nil?
+      return -1
+    end
+
+    left_tree = balanced?(node.left)
+    return left_tree if left_tree == false
+
+    right_tree = balanced?(node.right)
+    return right_tree if right_tree == false
+
+    balance = (left_tree - right_tree).abs
+
+    return false if balance > 1
+    return true if node == @root
+    balance
+  end
+
+  def rebalance
+    new_array = self.inorder
+    @root = build_tree(new_array)
   end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
